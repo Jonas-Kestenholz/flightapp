@@ -11,6 +11,8 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Purpose:
@@ -30,6 +32,8 @@ public class FlightReader {
             //airportToAirport.forEach(System.out::println);
             List<FlightInfoDTO> depatureBeforeTime = depatureBeforeSpecificTime(LocalDateTime.of(2024,8, 15, 15, 0), flightInfoDTOList);
             depatureBeforeTime.forEach(System.out::println);
+            Map<String,Double> averageFlightTimePerAirline = getAverageAirlineFlightTime(flightInfoDTOList);
+            averageFlightTimePerAirline.forEach((key, value) -> System.out.println(key + ": " + value));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -94,6 +98,14 @@ public class FlightReader {
                 .filter(flight -> flight.getDeparture().isBefore(departure))
                 .toList();
         return flightsList;
+    }
+
+    public static Map<String,Double> getAverageAirlineFlightTime( List<FlightInfoDTO> flightList) {
+        return flightList.stream()
+                .filter(flight -> flight.getAirline() != null)
+                .collect(Collectors.groupingBy(flight -> flight.getAirline(),
+                        Collectors.averagingLong(flight -> Math.abs(Duration.between(flight.getDeparture(),flight.getArrival()).toMinutes()))));
+
     }
 
     

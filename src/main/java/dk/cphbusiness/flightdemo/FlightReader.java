@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Purpose:
@@ -22,9 +23,11 @@ public class FlightReader {
         try {
             List<FlightDTO> flightList = getFlightsFromFile("flights.json");
             List<FlightInfoDTO> flightInfoDTOList = getFlightInfoDetails(flightList);
-            System.out.println("Total minutes: ");
-            System.out.println(getTotalAirlineFlightTime("Lufthansa", flightInfoDTOList));
+            //System.out.println("Total minutes: ");
+            //System.out.println(getTotalAirlineFlightTime("Lufthansa", flightInfoDTOList));
            // flightInfoDTOList.forEach(System.out::println);
+            List<FlightInfoDTO> airportToAirport = getFlightsFromTwoAirports("Fukuoka","Haneda Airport",flightInfoDTOList);
+            airportToAirport.forEach(System.out::println);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -73,5 +76,19 @@ public class FlightReader {
                 .mapToLong(flight -> flight.getDuration().toMinutes())
                 .sum();
         return totalDuration;
+    }
+
+    public static List<FlightInfoDTO> getFlightsFromTwoAirports(String airport1,String airport2,List<FlightInfoDTO> flightList) {
+        List<FlightInfoDTO> flightsList = flightList.stream()
+                .filter(flight -> flight.getOrigin() != null)
+                .filter(flight -> flight.getDestination() != null)
+                .filter(flight -> flight.getOrigin().equalsIgnoreCase(airport1) && flight.getDestination().equalsIgnoreCase(airport2))
+                .toList();
+        return flightsList;
+
+
+
+
+
     }
 }

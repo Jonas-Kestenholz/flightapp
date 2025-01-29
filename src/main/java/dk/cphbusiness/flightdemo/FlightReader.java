@@ -73,6 +73,5 @@ public class FlightReader {
                 .mapToLong(flight -> flight.getDuration().toMinutes())
                 .sum();
         return totalDuration;
-
     }
 }
